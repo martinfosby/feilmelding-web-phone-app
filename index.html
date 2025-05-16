@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Communication Client - Calling Sample</title>
+  </head>
+  <body>
+    <h4>Azure Communication Services</h4>
+    <h1>Calling Quickstart</h1>
+    <input 
+      id="token-input"
+      type="text"
+      placeholder="User access token"
+      style="margin-bottom:1em; width: 200px;"
+    />
+    </div>
+    <button id="token-submit" type="button">
+        Submit
+    </button>
+    <input 
+      id="callee-id-input"
+      type="text"
+      placeholder="Who would you like to call?"
+      style="margin-bottom:1em; width: 200px; display: block;"
+    />
+    <div>
+      <button id="call-button" type="button" disabled="true">
+        Start Call
+      </button>
+      &nbsp;
+      <button id="accept-call-button" type="button" disabled="true">
+        Accept Call
+      </button>
+      &nbsp;
+      <button id="hang-up-button" type="button" disabled="true">
+        Hang Up
+      </button>
+    </div>
+    <div id="dtmf-keypad" style="margin-top: 1em;">
+        <h3>DTMF Keypad</h3>
+        <div style="display: grid; grid-template-columns: repeat(3, 50px); gap: 5px;">
+            <button class="dtmf-btn" value="Num1">1</button>
+            <button class="dtmf-btn" value="Num2">2</button>
+            <button class="dtmf-btn" value="Num3">3</button>
+            <button class="dtmf-btn" value="Num4">4</button>
+            <button class="dtmf-btn" value="Num5">5</button>
+            <button class="dtmf-btn" value="Num6">6</button>
+            <button class="dtmf-btn" value="Num7">7</button>
+            <button class="dtmf-btn" value="Num8">8</button>
+            <button class="dtmf-btn" value="Num9">9</button>
+            <button class="dtmf-btn" value="Star">*</button>
+            <button class="dtmf-btn" value="Num0">0</button>
+          <button class="dtmf-btn" value="Pound">#</button>
+        </div>
+      </div>
+      
+    <script src="./main.js"></script>
+  </body>
+</html>
