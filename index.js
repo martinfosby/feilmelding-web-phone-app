@@ -18,6 +18,54 @@ const submitToken = document.getElementById("token-submit");
 const callButton = document.getElementById("call-button");
 const hangUpButton = document.getElementById("hang-up-button");
 const acceptCallButton = document.getElementById('accept-call-button');
+const caller_user = document.getElementById("caller-id");
+
+const getToken = document.getElementById('get-token-from-server');
+getToken.addEventListener("click", async () => {
+    const callClient = new CallClient();
+  
+    try {
+      // Call your Azure Function endpoint
+      const response = await fetch("https://opptak-t-bachelor2025.azurewebsites.net/api/generate-user-and-token"); // Update the URL to your actual function URL
+      if (!response.ok) throw new Error("Failed to fetch token");
+    
+      console.log(response);
+      const data = await response.json();
+      console.log(data);
+      // Assuming data.token contains the token string
+      const userTokenCredential = data.token.tokenValue;
+      const callerId = data.user.rawId;
+      caller_user.textContent = callerId;
+      console.log("Caller ID:", callerId);
+  
+      console.log(userTokenCredential);
+      tokenCredential = new AzureCommunicationTokenCredential(userTokenCredential);
+      callAgent = await callClient.createCallAgent(tokenCredential);
+      const deviceManager = await callClient.getDeviceManager();
+      await deviceManager.askDevicePermission({ audio: true });
+  
+      const speakers = await deviceManager.getSpeakers();
+      console.log("Speakers:", speakers);
+      const microphones = await deviceManager.getMicrophones();
+      console.log("Microphones:", microphones);
+  
+      callButton.disabled = false;
+      submitToken.disabled = true;
+  
+      callAgent.on("incomingCall", async (args) => {
+        try {
+          incomingCall = args.incomingCall;
+          acceptCallButton.disabled = false;
+          callButton.disabled = true;
+        } catch (error) {
+          console.error(error);
+        }
+      });
+    } catch (error) {
+      console.error(error);
+      window.alert("Please submit a valid token!");
+    }
+  });
 
 submitToken.addEventListener("click", async () => {
     const callClient = new CallClient();
@@ -31,7 +79,10 @@ submitToken.addEventListener("click", async () => {
         // Get speakers
         const speakers = await deviceManager.getSpeakers();
         console.log("Speakers:", speakers);
-
+        const microphones = await deviceManager.getMicrophones();
+        console.log("Microphones:", microphones);
+        // deviceManager.selectMicrophone();
+        
         callButton.disabled = false;
         submitToken.disabled = true;
         // Listen for an incoming call to accept.
