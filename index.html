@@ -1,62 +1,153 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <title>Communication Client - Calling Sample</title>
-  </head>
-  <body>
-    <h4>Azure Communication Services</h4>
-    <h1>Calling Quickstart</h1>
-    <input 
-      id="token-input"
-      type="text"
-      placeholder="User access token"
-      style="margin-bottom:1em; width: 200px;"
-    />
-    </div>
-    <button id="token-submit" type="button">
-        Submit
-    </button>
-    <button id="get-token-from-server" type="button">get token</button>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Communication Client - feilmelding app</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 1rem;
+      margin: 0;
+      box-sizing: border-box;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      max-width: 400px;
+      padding: 0.6em;
+      margin-bottom: 1em;
+      font-size: 1rem;
+    }
+
+    button {
+      padding: 0.6em 1em;
+      margin: 0.25em 0.5em 0.25em 0;
+      font-size: 1rem;
+      border: none;
+      border-radius: 5px;
+      background-color: #0078d4;
+      color: white;
+      cursor: pointer;
+    }
+
+    button:disabled {
+      background-color: #cccccc;
+      cursor: not-allowed;
+    }
+
+    #dtmf-keypad {
+      margin-top: 2em;
+    }
+
+    #dtmf-keypad h3 {
+      margin-bottom: 0.5em;
+    }
+
+    .dtmf-btn {
+      padding: 1em;
+      font-size: 1.2rem;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      background-color: #f0f0f0;
+      width: 100%;
+      max-width: 50px;
+    }
+
+    .dtmf-btn.active {
+      background-color: #0078d4;  /* highlight color */
+      color: white;
+      transform: scale(0.95);
+      transition: all 0.1s ease;
+    }
+
+
+    .dtmf-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      justify-content: center;
+      place-items: center;
+    }
+
+    #caller-id {
+      font-weight: bold;
+    }
+    #token-id {
+      font-weight: bold;
+      color: #0078d4;
+    }
+    #token-expiry {
+      font-style: italic;
+    }
+
+    .token {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 200px; /* or any width */
+      display: block;
+    }
+
+    @media (max-width: 480px) {
+      button, .dtmf-btn {
+        font-size: 1rem;
+        padding: 0.8em;
+      }
+
+      .dtmf-grid {
+        gap: 8px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="communication-controls" style="display: grid; place-items: center;">
+    <h1>Bodø Kommune Feilmelding App</h1>
+    
     <div>
-        Caller id: <p id="caller-id"></p>
+      <p>Your Token: <span id="token-id" class="token"></span></p>
+      <p>Token expiry: <span id="token-expiry"></span></p>
+      <p id="token-error" style="color: red; display: none;"></p>
+      <p>Your Caller ID: <span id="caller-id"></span></p>
     </div>
+    
     <input 
       id="callee-id-input"
       type="text"
       placeholder="Who would you like to call?"
-      style="margin-bottom:1em; width: 200px; display: block;"
+      value="8:acs:4aa62437-d905-441f-a3f7-3f8d4cf85da6_00000027-74b8-6c99-874a-ad3a0d002939"
     />
+    
     <div>
-      <button id="call-button" type="button" disabled="true">
-        Start Call
-      </button>
-      &nbsp;
-      <button id="accept-call-button" type="button" disabled="true">
-        Accept Call
-      </button>
-      &nbsp;
-      <button id="hang-up-button" type="button" disabled="true">
-        Hang Up
-      </button>
+      <button id="call-button" type="button" disabled>Start Call</button>
+      <button id="accept-call-button" type="button" disabled>Accept Call</button>
+      <button id="hang-up-button" type="button" disabled>Hang Up</button>
     </div>
-    <div id="dtmf-keypad" style="margin-top: 1em;">
-        <h3>DTMF Keypad</h3>
-        <div style="display: grid; grid-template-columns: repeat(3, 50px); gap: 5px;">
-            <button class="dtmf-btn" value="Num1">1</button>
-            <button class="dtmf-btn" value="Num2">2</button>
-            <button class="dtmf-btn" value="Num3">3</button>
-            <button class="dtmf-btn" value="Num4">4</button>
-            <button class="dtmf-btn" value="Num5">5</button>
-            <button class="dtmf-btn" value="Num6">6</button>
-            <button class="dtmf-btn" value="Num7">7</button>
-            <button class="dtmf-btn" value="Num8">8</button>
-            <button class="dtmf-btn" value="Num9">9</button>
-            <button class="dtmf-btn" value="Star">*</button>
-            <button class="dtmf-btn" value="Num0">0</button>
-          <button class="dtmf-btn" value="Pound">#</button>
-        </div>
-      </div>
-      
-    <script src="./main.js"></script>
-  </body>
+    
+    <p id="call-state-display"></p>
+  </div>
+  
+  <div id="dtmf-keypad">
+    <h3>DTMF Keypad</h3>
+    <div class="dtmf-grid">
+      <button class="dtmf-btn" value="Num1">1</button>
+      <button class="dtmf-btn" value="Num2">2</button>
+      <button class="dtmf-btn" value="Num3">3</button>
+      <button class="dtmf-btn" value="Num4">4</button>
+      <button class="dtmf-btn" value="Num5">5</button>
+      <button class="dtmf-btn" value="Num6">6</button>
+      <button class="dtmf-btn" value="Num7">7</button>
+      <button class="dtmf-btn" value="Num8">8</button>
+      <button class="dtmf-btn" value="Num9">9</button>
+      <button class="dtmf-btn" value="Star">*</button>
+      <button class="dtmf-btn" value="Num0">0</button>
+      <button class="dtmf-btn" value="Pound">#</button>
+    </div>
+  </div>
+
+  <h4>Powered By Azure Communication Services</h4>
+  
+  <script src="./main.js"></script>
+</body>
 </html>
