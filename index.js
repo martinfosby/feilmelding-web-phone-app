@@ -25,6 +25,10 @@ function isTokenExpired(expiresOn) {
   return now >= expiry;
 }
 
+function log(msg) {
+    document.getElementById("debug-log").innerText += msg + "\n";
+}
+
 window.addEventListener("DOMContentLoaded", async () => {
     try {
       let userTokenCredential;
@@ -79,17 +83,22 @@ async function initializeCallClient(token) {
     callStateDisplay.textContent = `Call state: ${callAgent.connectionState}`;
     callStateDisplay.style = "color: red; font-weight: bold;";
 
-
     const deviceManager = await callClient.getDeviceManager();
     await deviceManager.askDevicePermission({ audio: true });
 
-    const [speakers, microphones] = await Promise.all([
-      deviceManager.getSpeakers(),
-      deviceManager.getMicrophones()
-    ]);
+    
+    // try {
+    //   const [speakers, microphones] = await Promise.all([
+    //     deviceManager.getMicrophones ? deviceManager.getMicrophones() : Promise.resolve([])
+    //   ]);
+    //   console.log("Speakers:", speakers);
+    //   console.log("Microphones:", microphones);
+    // } catch (error) {
+    //   console.error("Error fetching devices:", error);
+    //   alert("Error fetching devices: " + error.message);
+    //   return;
+    // }
 
-    console.log("Speakers:", speakers);
-    console.log("Microphones:", microphones);
 
 
     callButton.disabled = false;
@@ -103,7 +112,7 @@ async function initializeCallClient(token) {
         console.error(error);
       }
     });
-  }
+}
 
 
 
