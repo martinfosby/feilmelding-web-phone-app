@@ -44,7 +44,16 @@ window.addEventListener("DOMContentLoaded", async () => {
         userToken.textContent = "Fetching token value...";
         tokenExpiry.textContent = "Fetching token expiry...";
         userCallId.textContent = "Fetching Caller ID...";
-        const response = await fetch("https://opptak-t-bachelor2025.azurewebsites.net/api/generate-user-and-token"); // Update the URL to your actual function URL
+
+        // Determine the base URL based on the environment
+        // Use localhost for local development and production URL for deployed environment
+        const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+        const baseUrl = isLocal
+          ? "http://localhost:7071/api"
+          : "https://opptak-t-bachelor2025.azurewebsites.net/api";
+
+        const response = await fetch(`${baseUrl}/generate-user-and-token`);
+
         if (!response.ok) throw new Error("Failed to fetch token");
         const data = await response.json();
         const token = data.token;
@@ -132,7 +141,6 @@ callButton.addEventListener("click", () => {
       }
     }
   );
-  
 
   hangUpButton.disabled = false;
   callButton.disabled = true;
